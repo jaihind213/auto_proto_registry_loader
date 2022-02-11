@@ -120,4 +120,4 @@ As always, if you have any feedback , I welcome it.
 
 ## Stars
 
-If you find the project useful, kindly leave it a github star. Thanks in Advance.
+If you find the project useful, kindly leave it a github star.
