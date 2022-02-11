@@ -15,7 +15,7 @@ const pkg = "pocket_registry"
 func main() {
 	args := os.Args[1:]
 	if len(args) < 2 {
-		panic("require 2 arguments 1st argument: <directory full path containing protobuff generated golang code>, 2nd argument: <golang module url>. example usage: go run /home/project/proto/golang/ github.com/dc/batman")
+		panic("require 2 arguments. 1st argument: <directory full path containing protobuff generated golang code>, 2nd argument: <golang module url>. example usage: go run run -mod=mod github.com/jaihind213/auto_proto_registry_loader/load/ /home/project/proto/golang/ github.com/dc/batman")
 	}
 
 	goProtoCodeDir := args[0]

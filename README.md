@@ -18,3 +18,97 @@ Enable your Golang module to now serve as a Schema Registry as well.
 i.e. make the 'protoregistry.GlobalTypes.FindMessageByName(name)' method work without reading proto files.
 
 ## How to prepare your golang module ?
+
+Say you have the golang module 'github.com/dc/batman' which you intend to also serve a golang registry:
+
+```bash
+project_dir(github.com/dc/batman)   
+    |-- LICENSE
+    |-- README.md
+    |-- go.mod
+    |-- go.sum
+    |-- go_bindings
+    |   |-- foo
+    |   |   `-- bar.pb.go
+    |-- proto
+    |   `-- foo
+    |       `-- bar
+    |           `-- bar.proto
+```
+
+1. prepare the registry for loading the types
+```
+cd $project_dir
+#go run -mod=mod github.com/jaihind213/auto_proto_registry_loader/load/ <full_path_to__go_bindings> <go_module_url> 
+go run -mod=mod github.com/jaihind213/auto_proto_registry_loader/load/ $go_workspace_dir/src/github.com/dc/batman/go_bindings github.com/dc/batman
+#run go mod tidy, to undo the change go run does to your go.mod file
+go mod tidy
+```
+
+After running the auto_proto_registry_loader, you will notice a new file has been generated (pocket_registry/register_proto_defs.go)
+
+```bash
+project_dir(github.com/dc/batman)    
+    |-- LICENSE
+    |-- README.md
+    |-- go.mod
+    |-- go.sum
+    |-- go_bindings
+    |   |-- foo
+    |   |   `-- bar.pb.go
+    |   `-- pocket_registry
+    |       `-- register_proto_defs.go
+    |-- proto
+    |   `-- foo
+    |       `-- bar
+    |           `-- bar.proto
+```
+
+2. Commit this file (pocket_registry/register_proto_defs.go) into the github.com/dc/batman repo !
+
+3. Run your build and package the golang module.
+
+4. In your golang source code which imports this golang module (i.e imports github.com/dc/batman), add an implicit import.
+ ```
+import (
+	_ "github.com/dc/batman/go_bindings/pocket_registry"
+	...
+)
+```
+
+5.And add Code for lookup of type by name as follows:
+```
+//this requires an import of "google.golang.org/protobuf/reflect/protoregistry"
+msgType, err := protoregistry.GlobalTypes.FindMessageByName(protoreflect.FullName("foo.bar.Keeper"))
+//now use golang reflection to create instance of that type.
+msgInstance := msgType.New().Interface()
+if e := protojson.Unmarshal(json, msgInstance.(proto.Message)); e != nil {
+    fmt.Print(e.Error())
+}
+```
+
+## Protecting the build
+
+As you have seen, once we prepare the auto-generated file, we need to commit it into the repo.
+Sometimes, a developer might forget to re-run the preparation step after he/she modifies the proto definitions.
+
+You could automate the 2 steps (preparation + commit to repo) as part of your build process 
+
+or
+
+The 2 steps remain manual with a check in build process to see if developer has done the 2 steps.
+
+Here is an example of how I did it gitlab-ci.yml
+
+```
+validate_imports:
+  stage: check_imports_file
+  image: golang:1.15
+  script:
+    - go run -mod=mod github.com/jaihind213/auto_proto_registry_loader/load/ <full_path_to__go_bindings> <go_module_url>
+    - git status
+    - exit_code=0
+    - git status|grep register_proto_defs.go |grep modified || exit_code=$?
+    - if [ ${exit_code} -eq 0 ];then echo "please run 'go run -mod=mod github.com/jaihind213/auto_proto_registry_loader/load/ <full_path_to__go_bindings> <go_module_url>' & commit the generated file 'register_proto_defs.go' for build to succeed"; exit 2; fi
+
+```
