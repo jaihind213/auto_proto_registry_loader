@@ -1,8 +1,0 @@
-syntax = "proto3";
-package foo.bar;
-
-option go_package = "github.com/jaihind213/auto_proto_registry_loader/go_bindings/foo";
-
-message Keeper {
-  string name = 1;
-}

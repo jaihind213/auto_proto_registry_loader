@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.27.1
 // 	protoc        v3.19.2
-// source: foo/bar/bar.proto
+// source: foo/bar/bar.example_proto
 
 package foo
 
