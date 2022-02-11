@@ -11,6 +11,7 @@ import (
 
 const pkg = "pocket_registry"
 
+//note: this can be implemented as bash script too! since we are in golang, why not just do in golang its easy!
 //scan through the protobuff generated golang code and prepare for loading into protobuff registry object.
 func main() {
 	args := os.Args[1:]
