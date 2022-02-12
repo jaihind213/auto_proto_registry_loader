@@ -12,4 +12,12 @@ func TestLookup(t *testing.T) {
 	if err != nil {
 		t.Error("error in looking up type Foo. it should exist in registry but does not ! ," + err.Error())
 	}
+
+	def, e := protoregistry.GlobalTypes.FindMessageByName(protoreflect.FullName("Def"))
+	if e != nil {
+		t.Error("error in looking up type Def. it should exist in registry but does not ! ," + e.Error())
+	} else {
+		print(def.Descriptor().FullName())
+	}
+
 }

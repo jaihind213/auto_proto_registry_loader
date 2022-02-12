@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+option go_package = "github.com/jaihind213/auto_proto_registry_loader/example_go_bindings/abc";
+
+message Def {
+  string zyz = 1;
+}
