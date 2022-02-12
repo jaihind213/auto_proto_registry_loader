@@ -150,4 +150,4 @@ As always, if you have any feedback , I welcome it.
 
 ## Stars
 
-If you find the project useful, kindly leave it a github star.
+If you find the project useful, kindly leave it a github star. :pray:	
